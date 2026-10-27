@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>台北一日行程</title>
+<style>
+  :root{--bg:#f4f5fb;--card:#fff;--ink:#1f2333;--muted:#7a7f94;--accent:#5b5bf7;--accent2:#ff5c8a;--red:#e3002c;--green:#008659;--orange:#f8b61c;--warn:#b26a00;--radius:20px}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;background:#dfe2ef;color:var(--ink);display:flex;justify-content:center}
+  .phone{width:100%;max-width:440px;height:100vh;height:100dvh;background:var(--bg);position:relative;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 40px rgba(0,0,0,.12)}
+  @media(min-width:600px){body{padding:24px 0}.phone{height:calc(100vh - 48px);border-radius:36px;border:8px solid #1f2333}}
+  header{background:linear-gradient(135deg,var(--accent),#8a5cf7 60%,var(--accent2));color:#fff;padding:22px 20px 18px;flex-shrink:0}
+  header .sub{opacity:.85;font-size:.82rem}
+  header h1{font-size:1.45rem;margin:2px 0 12px}
+  .progress{background:rgba(255,255,255,.25);height:8px;border-radius:8px;overflow:hidden}
+  .progress i{display:block;height:100%;width:0;background:#fff;border-radius:8px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+  .ptext{font-size:.78rem;margin-top:6px;opacity:.9;display:flex;justify-content:space-between}
+  main{flex:1;overflow-y:auto;padding:16px 16px 100px;scroll-behavior:smooth}
+  .view{display:none;animation:fade .35s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:0 4px 18px rgba(40,40,90,.06)}
+  .stop{display:flex;gap:12px;cursor:pointer;transition:transform .15s}
+  .stop:active{transform:scale(.98)}
+  .stop .ic{width:46px;height:46px;border-radius:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;background:#eef0ff}
+  .stop.done .ic{background:#e3f7ec}
+  .stop.now{outline:3px solid var(--accent2);outline-offset:2px}
+  .stop .body{flex:1;min-width:0}
+  .stop .t{font-size:.78rem;color:var(--accent);font-weight:700}
+  .stop h3{font-size:1.05rem;margin:1px 0}
+  .stop .addr{font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chk{width:28px;height:28px;border-radius:50%;border:2px solid #cfd2e3;flex-shrink:0;align-self:center;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.9rem;transition:all .2s}
+  .stop.done .chk{background:#22c55e;border-color:#22c55e}
+  .stop.done h3{text-decoration:line-through;color:var(--muted)}
+  .detail{max-height:0;overflow:hidden;transition:max-height .4s ease}
+  .card.open .detail{max-height:900px}
+  .detail-inner{padding-top:12px;border-top:1px dashed #e3e5f0;margin-top:12px;font-size:.88rem;line-height:1.65}
+  .detail-inner ul{padding-left:18px}
+  .tag{display:inline-block;font-size:.72rem;padding:2px 8px;border-radius:999px;background:#eef0ff;color:var(--accent);margin:2px 4px 2px 0}
+  .warn{color:var(--warn);background:#fff6e5;border-radius:10px;padding:6px 10px;margin-top:8px;font-size:.8rem}
+  .btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .btn{flex:1;text-align:center;text-decoration:none;font-size:.82rem;font-weight:700;padding:9px 10px;border-radius:12px;background:var(--accent);color:#fff;border:none;cursor:pointer;min-width:110px}
+  .btn.ghost{background:#eef0ff;color:var(--accent)}
+  .leg{margin:-4px 0 14px 22px;padding:8px 0 8px 22px;border-left:3px dotted #c9cce0;font-size:.8rem;color:var(--muted)}
+  .leg b{color:var(--ink)}
+  .line{display:inline-block;color:#fff;font-weight:700;font-size:.72rem;padding:1px 8px;border-radius:6px;margin-right:4px}
+  .l-red{background:var(--red)}.l-green{background:var(--green)}.l-orange{background:var(--orange);color:#3a2a00}.l-walk{background:#8e93a8}
+  .mapbox{border-radius:var(--radius);overflow:hidden;height:330px;background:#e6e8f2;margin-bottom:12px;box-shadow:0 4px 18px rgba(40,40,90,.06)}
+  .mapbox iframe{width:100%;height:100%;border:0}
+  .pills{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px}
+  .pill{flex-shrink:0;border:none;background:#fff;border-radius:999px;padding:8px 14px;font-size:.82rem;cursor:pointer;box-shadow:0 2px 8px rgba(40,40,90,.06);font-family:inherit}
+  .pill.active{background:var(--accent);color:#fff}
+  .step{display:flex;gap:12px;align-items:flex-start}
+  .step .num{width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem}
+  .step h4{font-size:.95rem}
+  .step p{font-size:.84rem;color:#454a60;line-height:1.6;margin-top:3px}
+  .exit{display:inline-block;background:#1f2333;color:#fff;border-radius:6px;padding:0 7px;font-size:.75rem;font-weight:700}
+  .row{display:flex;justify-content:space-between;font-size:.86rem;padding:8px 0;border-bottom:1px solid #f0f1f6}
+  .row:last-child{border:none}
+  input[type=date]{width:100%;padding:12px;border-radius:12px;border:1px solid #d9dbe8;font-size:1rem;font-family:inherit;margin-top:8px}
+  .status{margin-top:12px;font-size:.88rem;line-height:1.7}
+  .ok{color:#15803d}.bad{color:#dc2626}.mid{color:var(--warn)}
+  nav{position:absolute;bottom:0;left:0;right:0;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);display:flex;padding:8px 6px calc(10px + env(safe-area-inset-bottom));border-top:1px solid #e6e8f2}
+  nav button{flex:1;border:none;background:none;font-family:inherit;font-size:.7rem;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0}
+  nav button span{font-size:1.3rem;transition:transform .2s}
+  nav button.active{color:var(--accent);font-weight:700}
+  nav button.active span{transform:translateY(-3px) scale(1.12)}
+  .now-banner{background:linear-gradient(135deg,#ff5c8a,#ff8a5c);color:#fff;border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:none}
+  .now-banner small{opacity:.85}
+  h2.sec{font-size:1rem;margin:4px 4px 10px}
+</style>
+</head>
+<body>
+<div class="phone">
+  <header>
+    <div class="sub">📍 台北・中山 ／ 大稻埕 一日行程</div>
+    <h1>11:00 台北車站出發</h1>
+    <div class="progress"><i id="bar"></i></div>
+    <div class="ptext"><span id="ptext">0 / 7 完成</span><span id="clock"></span></div>
+  </header>
+
+  <main id="main">
+    <!-- 行程 -->
+    <section class="view active" id="v-plan">
+      <div class="now-banner" id="nowBanner"></div>
+      <div id="list"></div>
+    </section>
+
+    <!-- 地圖 -->
+    <section class="view" id="v-map">
+      <div class="pills" id="pills"></div>
+      <div class="mapbox"><iframe id="mapframe" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+      <div class="btns">
+        <a class="btn" id="fullRoute" target="_blank">🗺️ 用 Google 地圖開啟完整路線</a>
+      </div>
+    </section>
+
+    <!-- 交通 -->
+    <section class="view" id="v-transit">
+      <h2 class="sec">🚇 捷運 / 步行 交通指引</h2>
+      <div id="transit"></div>
+    </section>
+
+    <!-- 資訊 -->
+    <section class="view" id="v-info">
+      <div class="card">
+        <h2 class="sec" style="margin:0 0 4px">📅 檢查出發日期</h2>
+        <div style="font-size:.82rem;color:var(--muted)">選擇日期，自動檢查各店家是否營業</div>
+        <input type="date" id="date">
+        <div class="status" id="dateStatus"></div>
+      </div>
+      <div class="card">
+        <h2 class="sec" style="margin:0 0 6px">🕒 營業時間總覽</h2>
+        <div id="hours"></div>
+      </div>
+      <div class="card">
+        <h2 class="sec" style="margin:0 0 6px">🎟️ 需事先準備</h2>
+        <div class="row"><span>恐怖心展門票</span><span>全票 NT$450（Accupass）</span></div>
+        <div class="row"><span>池音拉麵</span><span>僅收現金、不接受訂位</span></div>
+        <div class="row"><span>悠遊卡</span><span>記得加值</span></div>
+      </div>
+      <div class="card">
+        <h2 class="sec" style="margin:0 0 6px">🐶 大耳狗活動</h2>
+        <div style="font-size:.85rem;line-height:1.6;color:#454a60">目前查無 10–11 月在中山／大稻埕／台北車站一帶的大耳狗（Cinnamoroll）快閃或展覽。出發前可再查看 Sanrio Taiwan 官方 IG 或新光三越、誠品南西的活動公告。</div>
+      </div>
+    </section>
+  </main>
+
+  <nav>
+    <button class="active" data-v="plan"><span>🗓️</span>行程</button>
+    <button data-v="map"><span>🗺️</span>地圖</button>
+    <button data-v="transit"><span>🚇</span>交通</button>
+    <button data-v="info"><span>ℹ️</span>資訊</button>
+  </nav>
+</div>
+
+<script>
+const gq = q => "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(q);
+const STOPS = [
+  {id:"s0",icon:"🚉",start:"11:00",end:"11:05",name:"台北車站集合",addr:"台北車站",q:"台北車站",
+   info:["集合後搭捷運紅線前往中山站"]},
+  {id:"s1",icon:"🍜",start:"11:15",end:"12:15",name:"池音拉麵",addr:"台北市大同區赤峰街23巷25號",q:"台北市大同區赤峰街23巷25號 池音",
+   tags:["鶏白湯拉麵","11:30 開店","現金"],
+   info:["約 20 個座位，不接受訂位，建議 11:15 前到現場排隊"],
+   warn:"午餐時段僅 週三／週六／週日 11:30–15:00；週二、四、五只開 16:30 後；週一公休"},
+  {id:"s2",icon:"🍓",start:"12:35",end:"13:45",name:"大稻埕・迪化街",addr:"台北市大同區迪化街一段19號（路力草莓大福）",q:"台北市大同區迪化街一段19號",
+   tags:["草莓大福","霞海城隍廟","永樂市場"],
+   info:["路力草莓大福：迪化街一段19號（永樂市場對面），11:00–18:00","霞海城隍廟：迪化街一段61號","迪化街老街屋、南北貨、文創小店"],
+   warn:"草莓大福常在下午提早售完，因此排在午餐後第一站"},
+  {id:"s3",icon:"🎨",start:"14:05",end:"15:05",name:"中山區 文創・市集",addr:"赤峰街 ／ 心中山線形公園",q:"心中山線形公園",
+   tags:["赤峰街","選物店","線形公園市集"],
+   info:["沿南京西路走回中山，順路逛赤峰街巷弄選物店","心中山線形公園（中山站～雙連站之間），假日常有市集"]},
+  {id:"s4",icon:"👻",start:"15:15",end:"16:30",name:"恐怖心展 @ 灰棚",addr:"台北市中山區中山北路二段59巷16號 B1",q:"台北市中山區中山北路二段59巷16號",
+   tags:["10:00–21:00","最後入場 20:30","全票 NT$450"],
+   info:["展期：2026/9/12 – 11/23","電子票券（Accupass）"]},
+  {id:"s5",icon:"☕",start:"16:50",end:"18:15",name:"TankQ Cafe & Bar",addr:"台北市中山區松江路90巷3-2號",q:"台北市中山區松江路90巷3-2號 TankQ",
+   tags:["松江南京店","02-2521-9930"],
+   info:["捷運松江南京站 3 號出口步行約 3 分鐘"],
+   warn:"各來源營業時間不一（約 11:00/11:30 – 22:00 以後），出發前請確認"},
+  {id:"s6",icon:"🍚",start:"18:35",end:"19:30",name:"黃記魯肉飯",addr:"台北市中山區中山北路二段183巷28號",q:"台北市中山區中山北路二段183巷28號 黃記魯肉飯",
+   tags:["米其林必比登","02-2595-8396"],
+   info:["近晴光市場"],
+   warn:"最新資料：12:00–21:30，週一公休（舊資料寫週四也休，請先確認）"}
+];
+const LEGS = [
+  {from:0,to:1,mins:"約 10 分",steps:[
+    {line:"red",txt:"淡水信義線（紅線）",title:"台北車站 上車",desc:"往「淡水／北投」方向，搭 1 站"},
+    {exit:"5",title:"中山站 下車",desc:"走 5 號出口（赤峰街）"},
+    {line:"walk",txt:"步行",title:"步行約 5 分鐘",desc:"進赤峰街 23 巷即達池音拉麵"}]},
+  {from:1,to:2,mins:"約 15–20 分",steps:[
+    {line:"walk",txt:"步行",title:"步行約 1.2 公里",desc:"赤峰街 → 南京西路往西直走 → 右轉迪化街一段，草莓大福在 19 號"}]},
+  {from:2,to:3,mins:"約 15–20 分",steps:[
+    {line:"walk",txt:"步行",title:"沿南京西路往東走回中山",desc:"經永樂市場 → 南京西路 → 赤峰街，接著逛到心中山線形公園"}]},
+  {from:3,to:4,mins:"約 5–10 分",steps:[
+    {line:"walk",txt:"步行",title:"往中山北路二段",desc:"穿過中山站 3 號出口一帶（中山北路二段）→ 進 59 巷，16 號 B1 即灰棚"}]},
+  {from:4,to:5,mins:"約 15 分",steps:[
+    {line:"walk",txt:"步行",title:"步行回中山站",desc:"由 3 號出口進站，約 5–8 分鐘"},
+    {line:"green",txt:"松山新店線（綠線）",title:"中山站 上車",desc:"往「松山」方向，搭 1 站"},
+    {exit:"3",title:"松江南京站 下車",desc:"走 3 號出口"},
+    {line:"walk",txt:"步行",title:"步行約 3 分鐘",desc:"松江路 90 巷 3-2 號即 TankQ Cafe"}]},
+  {from:5,to:6,mins:"約 15–20 分",steps:[
+    {line:"orange",txt:"中和新蘆線（橘線）",title:"松江南京站 上車",desc:"往「蘆洲／迴龍」方向皆可，搭 2 站（經行天宮）"},
+    {exit:"1",title:"中山國小站 下車",desc:"走 1 號出口（林森北路，車站西端）"},
+    {line:"walk",txt:"步行",title:"步行約 6–8 分鐘",desc:"往西到中山北路二段 183 巷，28 號即黃記魯肉飯"}]}
+];
+
+const KEY="tpe-trip-done";
+let done = JSON.parse(localStorage.getItem(KEY)||"[]");
+const toMin = s => {const [h,m]=s.split(":").map(Number);return h*60+m};
+
+function renderList(){
+  const list = document.getElementById("list"); list.innerHTML="";
+  STOPS.forEach((s,i)=>{
+    const c=document.createElement("div");
+    c.className="card"; c.dataset.i=i;
+    c.innerHTML=`
+      <div class="stop ${done.includes(s.id)?"done":""}" id="${s.id}">
+        <div class="ic">${s.icon}</div>
+        <div class="body"><div class="t">${s.start} – ${s.end}</div><h3>${s.name}</h3><div class="addr">${s.addr}</div></div>
+        <div class="chk" data-id="${s.id}">✓</div>
+      </div>
+      <div class="detail"><div class="detail-inner">
+        ${(s.tags||[]).map(t=>`<span class="tag">${t}</span>`).join("")}
+        <ul style="margin-top:6px">${s.info.map(x=>`<li>${x}</li>`).join("")}</ul>
+        ${s.warn?`<div class="warn">⚠️ ${s.warn}</div>`:""}
+        <div class="btns">
+          <a class="btn" target="_blank" href="${gq(s.q)}">📍 Google 地圖</a>
+          ${i>0?`<a class="btn ghost" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(STOPS[i-1].q)}&destination=${encodeURIComponent(s.q)}&travelmode=transit">🚇 從上一站導航</a>`:""}
+        </div>
+      </div></div>`;
+    list.appendChild(c);
+    const leg = LEGS.find(l=>l.from===i);
+    if(leg){
+      const d=document.createElement("div"); d.className="leg";
+      d.innerHTML = leg.steps.filter(x=>x.line).map(x=>`<span class="line l-${x.line}">${x.txt}</span>`).join("") + ` <b>${leg.mins}</b>`;
+      list.appendChild(d);
+    }
+  });
+  list.querySelectorAll(".card").forEach(c=>{
+    c.addEventListener("click",e=>{
+      if(e.target.closest(".chk")||e.target.closest("a"))return;
+      c.classList.toggle("open");
+    });
+  });
+  list.querySelectorAll(".chk").forEach(k=>k.addEventListener("click",()=>{
+    const id=k.dataset.id;
+    done = done.includes(id)?done.filter(x=>x!==id):[...done,id];
+    localStorage.setItem(KEY,JSON.stringify(done));
+    renderList(); updateProgress();
+  }));
+  highlightNow();
+}
+
+function updateProgress(){
+  const n=done.length;
+  document.getElementById("bar").style.width=(n/STOPS.length*100)+"%";
+  document.getElementById("ptext").textContent=`${n} / ${STOPS.length} 完成`;
+}
+
+function highlightNow(){
+  const now=new Date(), m=now.getHours()*60+now.getMinutes();
+  document.getElementById("clock").textContent=now.toTimeString().slice(0,5);
+  const banner=document.getElementById("nowBanner");
+  let cur=STOPS.findIndex(s=>m>=toMin(s.start)&&m<=toMin(s.end));
+  let next=STOPS.findIndex(s=>toMin(s.start)>m);
+  document.querySelectorAll(".stop.now").forEach(e=>e.classList.remove("now"));
+  if(cur>=0){
+    document.getElementById(STOPS[cur].id).classList.add("now");
+    banner.style.display="block";
+    banner.innerHTML=`<small>現在時段</small><div style="font-size:1.1rem;font-weight:700">${STOPS[cur].icon} ${STOPS[cur].name}</div><small>到 ${STOPS[cur].end}</small>`;
+  }else if(next>=0 && m>=toMin("10:00")){
+    banner.style.display="block";
+    banner.innerHTML=`<small>下一站</small><div style="font-size:1.1rem;font-weight:700">${STOPS[next].icon} ${STOPS[next].name}</div><small>${STOPS[next].start} 開始</small>`;
+  }else banner.style.display="none";
+}
+
+function renderMap(){
+  const pills=document.getElementById("pills");
+  const frame=document.getElementById("mapframe");
+  const all=STOPS.map(s=>s.q);
+  const routeEmbed="https://maps.google.com/maps?saddr="+encodeURIComponent(all[0])+"&daddr="+all.slice(1).map(encodeURIComponent).join("+to:")+"&dirflg=r&output=embed";
+  const opts=[{n:"🧭 全部路線",src:routeEmbed}].concat(STOPS.map(s=>({n:s.icon+" "+s.name,src:"https://maps.google.com/maps?q="+encodeURIComponent(s.q)+"&z=17&output=embed"})));
+  opts.forEach((o,i)=>{
+    const b=document.createElement("button"); b.className="pill"+(i===0?" active":""); b.textContent=o.n;
+    b.onclick=()=>{pills.querySelectorAll(".pill").forEach(p=>p.classList.remove("active"));b.classList.add("active");frame.src=o.src;};
+    pills.appendChild(b);
+  });
+  frame.src=routeEmbed;
+  document.getElementById("fullRoute").href="https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(all[0])+"&destination="+encodeURIComponent(all[all.length-1])+"&waypoints="+all.slice(1,-1).map(encodeURIComponent).join("%7C")+"&travelmode=walking";
+}
+
+function renderTransit(){
+  const box=document.getElementById("transit");
+  LEGS.forEach(l=>{
+    const c=document.createElement("div"); c.className="card";
+    c.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <b style="font-size:.95rem">${STOPS[l.from].icon} ${STOPS[l.from].name} → ${STOPS[l.to].icon} ${STOPS[l.to].name}</b>
+        <span class="tag">${l.mins}</span></div>`+
+      l.steps.map((s,i)=>`<div class="step" style="margin-bottom:10px">
+        <div class="num" style="background:${s.line==="red"?"var(--red)":s.line==="green"?"var(--green)":s.line==="orange"?"var(--orange)":s.exit?"#1f2333":"#8e93a8"}">${s.exit?"出":s.line==="walk"?"🚶":"🚇"}</div>
+        <div><h4>${s.line&&s.line!=="walk"?`<span class="line l-${s.line}">${s.txt}</span>`:""}${s.title} ${s.exit?`<span class="exit">${s.exit} 號出口</span>`:""}</h4><p>${s.desc}</p></div></div>`).join("")+
+      `<div class="btns"><a class="btn ghost" target="_blank" href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(STOPS[l.from].q)}&destination=${encodeURIComponent(STOPS[l.to].q)}&travelmode=transit">開啟 Google 地圖導航</a></div>`;
+    box.appendChild(c);
+  });
+}
+
+function renderInfo(){
+  document.getElementById("hours").innerHTML=[
+    ["池音拉麵","三・六・日 11:30–15:00 / 16:30–21:30<br>二・四・五 16:30–21:30｜週一休"],
+    ["路力草莓大福","11:00–18:00（常提早售完）"],
+    ["恐怖心展","10:00–21:00（最後入場 20:30）｜至 11/23"],
+    ["TankQ Cafe","約 11:00/11:30 起（請確認）"],
+    ["黃記魯肉飯","12:00–21:30｜週一休"]
+  ].map(r=>`<div class="row"><span>${r[0]}</span><span style="text-align:right;color:#454a60">${r[1]}</span></div>`).join("");
+  const inp=document.getElementById("date"), st=document.getElementById("dateStatus");
+  const check=()=>{
+    if(!inp.value){st.innerHTML="";return;}
+    const d=new Date(inp.value+"T12:00:00"), w=d.getDay(), names="日一二三四五六";
+    const out=[];
+    out.push([3,6,0].includes(w)?`<div class="ok">✅ 池音拉麵 午餐有營業</div>`:w===1?`<div class="bad">❌ 池音拉麵 週一公休</div>`:`<div class="bad">❌ 池音拉麵 週${names[w]} 午餐不營業（16:30 才開）</div>`);
+    out.push(w===1?`<div class="bad">❌ 黃記魯肉飯 週一公休</div>`:w===4?`<div class="mid">⚠️ 黃記魯肉飯 週四可能公休，請先確認</div>`:`<div class="ok">✅ 黃記魯肉飯 有營業</div>`);
+    out.push(d<=new Date("2026-11-23T23:59:59")&&d>=new Date("2026-09-12")?`<div class="ok">✅ 恐怖心展 展期內</div>`:`<div class="bad">❌ 恐怖心展 不在展期（9/12–11/23）</div>`);
+    out.push(`<div class="mid">⚠️ TankQ Cafe 營業時間請出發前確認</div>`);
+    st.innerHTML=`<b>週${names[w]}</b>`+out.join("");
+  };
+  inp.addEventListener("change",check);
+}
+
+document.querySelectorAll("nav button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById("v-"+b.dataset.v).classList.add("active");
+  document.getElementById("main").scrollTop=0;
+}));
+
+renderList(); updateProgress(); renderMap(); renderTransit(); renderInfo();
+setInterval(highlightNow,30000);
+</script>
+</body>
+</html>
